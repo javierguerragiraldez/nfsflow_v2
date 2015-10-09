@@ -88,16 +88,8 @@ nflog.__index = nflog
 local samplearray = ffi.new('samplearray', 1024)
 samplearray.n = 0
 
-local function chk(cond, r, l)
-	r = r or 0
-	if cond then return cond end
-	error (("r:%d errno:%d nflog_errno:%d"):format(
-		tonumber(r), tonumber(ffi.C.errno), tonumber(nflog_lib.nflog_errno)),
-		l or 2)
-end
-
 local function chkerr(r, err)
-	chk (tonumber(r) >= 0, r, 3)
+	assert(r >= 0, err)
 	return r
 end
 
@@ -110,15 +102,10 @@ function nflog:__new(family, group)
 
 	chkerr(nflog_lib.nflog_bind_pf(handle, family))
 
-	local g_handle = nflog_lib.nflog_bind_group(handle, group)
-	chk (g_handle ~= nil)
+	local g_handle = assert(nflog_lib.nflog_bind_group(handle, group))
 	chkerr(nflog_lib.nflog_set_mode(g_handle, ffi.C.NFULNL_COPY_PACKET, 0xFFFF))
 
-
 	nflog_lib.nflog_callback_register(g_handle, C.cb, samplearray)
-	print ('trying callback')
-	C.cb(nil, nil, nil, nil)
-	print ('go on..')
 
 	return handle
 end
@@ -138,53 +125,14 @@ function nflog:loop(cb)
 	local buf = ffi.new('uint8_t[?]', size)
 	while true do
 
-		local sz, err = S.recv(fd, buf, size)
-		if not sz then error(tostring(err)) end
--- 		print ('packet size', sz, buf)
+		local sz, err = assert(S.recv(fd, buf, size))
 
 		nflog_lib.nflog_handle_packet(self, buf, sz)
 
 		for i = 0, samplearray.n do
 			cb(samplearray.sample[i])
--- 			local s = samplearray.sample[i]
--- 			print ('header:', s.header.size, s.header.p)
--- 			utils.hexdump(s.header.p, s.header.size)
--- 			print ('payload:', s.payload.size, s.payload.p)
--- 			utils.hexdump(s.payload.p, s.payload.size)
 		end
 		samplearray.n = 0
-
--- 		local offs = 0
--- 		while offs < sz do
--- 			local hdr = ffi.cast('struct nfnlhdr*', buf+offs)
--- 			print ('type', hdr.nlh.nlmsg_type, 'length', hdr.nlh.nlmsg_len)
--- 			print (("flags %X, seq:%d, pid:%d"):format(
--- 				hdr.nlh.nlmsg_flags, hdr.nlh.nlmsg_seq, hdr.nlh.nlmsg_pid))
---
--- -- 			do
--- -- 				local hda = get_hda(buf+offs+ffi.sizeof('struct nfnlhdr'))
--- -- 				local buf = nflog_lib.nflog_get_msg_packet_hwhdr(hda)
--- -- 				local sz  = nflog_lib.nflog_get_msg_packet_hwhdrlen(hda)
--- -- 				print ('header length:', sz)
--- -- 				utils.hexdump(buf, sz)
--- --
--- -- 				local buf = ffi.new('uint8_t[?]', 2^16)
--- -- 				local bufp = ffi.new('uint8_t*[1]')
--- -- 				bufp[0] = buf
--- -- 				local sz = nflog_lib.nflog_get_payload(hda, bufp)
--- -- 				print ('payload length:', sz)
--- -- 				utils.hexdump(buf, sz)
--- -- 			end
---
--- 			if tonumber(hdr.nlh.nlmsg_type) == 1024 then
--- 				local r = cb(
--- 					buf + offs + ffi.sizeof('struct nlmsghdr'),
--- 					hdr.nlh.nlmsg_len - ffi.sizeof('struct nlmsghdr'))
--- 				if r == false then break end
--- 			end
--- 			offs = offs + hdr.nlh.nlmsg_len
--- 		end
--- 		utils.hexdump(buf, sz)
 	end
 end
 

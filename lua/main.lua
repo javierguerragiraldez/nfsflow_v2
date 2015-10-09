@@ -27,21 +27,13 @@ end
 
 local logh = nflog(S.c.AF.INET6, tonumber(opts['nflog-group']))
 
--- logh:loop(function (buf, size)
--- 	utils.hexdump(buf, size)
--- 	do return end
---
--- 	outport:add(buf+64, {incl_len = size-64, orig_len = size-64})
--- 	if outport:full() then
--- 		send(outport:flush())
--- 	end
--- end)
-
 local buf = ffi.new('uint8_t[?]', 8192)
 logh:loop(function(sample)
 	local offset = 0
+	
 	ffi.copy(buf + offset, sample.header.p, sample.header.size)
 	offset = offset + sample.header.size
+
 	ffi.copy(buf + offset, sample.payload.p, sample.payload.size)
 	offset = offset + sample.payload.size
 

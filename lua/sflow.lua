@@ -61,7 +61,6 @@ ffi.cdef [[
 local Port = {}
 Port.__index = Port
 
--- TODO: create le_uint types to handle little endian fields
 local htonl, ntohl = bit.bswap, bit.bswap
 local localtime = 1			-- TODO: get time sporadically
 

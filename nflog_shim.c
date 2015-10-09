@@ -26,11 +26,11 @@ typedef struct {
 int cb(struct nflog_g_handle *gh,
 			  struct nfgenmsg *nfmsg,
 			  struct nflog_data *nfa, void *data) {
-	printf ("callback! (%p, %p, %p, %p)\n", gh, nfmsg, nfa, data);
 	if (!data) return 0;
 
 	samplearray *out = (samplearray *)data;
 	logsample *sample = &out->sample[out->n];
+
 	sample->header.p = nflog_get_msg_packet_hwhdr(nfa);
 	sample->header.size = nflog_get_msg_packet_hwhdrlen(nfa);
 	sample->payload.size = nflog_get_payload(nfa, &sample->payload.p);
