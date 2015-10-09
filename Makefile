@@ -4,7 +4,7 @@ CFLAGS = -Wall -D__USE_GNU
 LIBS+= luajit/src/libluajit.a -lnetfilter_log -lm -ldl
 LDFLAGS+= -Wl,-E
 
-luafiles := $(shell ls lua/*.lua)
+luafiles := $(shell find lua ljsyscall -name '*.lua')
 LUAOBJS := $(addsuffix .o, $(luafiles))
 
 OBJS = nflog_shim.o
@@ -20,8 +20,7 @@ clean:
 luajit:
 	cd luajit && $(MAKE)
 
-%.lua.h: %.lua
-	LUA_PATH='./luajit/src/?.lua' luajit/src/luajit -bg $< $@
+.SUFFIXES:
 
 %.lua.o: %.lua
-	LUA_PATH='./luajit/src/?.lua' luajit/src/luajit -bg $< $@
+	LUA_PATH='./luajit/src/?.lua' luajit/src/luajit -bgn $(subst /,_,$(patsubst lua/%,%,$(patsubst ljsyscall/%,%,$(basename $<)))) $< $@

@@ -2,3 +2,6 @@
 	path = luajit
 	url = http://luajit.org/git/luajit-2.0.git
 	branch = v2.1
+[submodule "ljsyscall"]
+	path = ljsyscall
+	url = https://github.com/justincormack/ljsyscall
