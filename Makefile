@@ -10,11 +10,11 @@ LUAOBJS := $(addsuffix .o, $(luafiles))
 OBJS = nflog_shim.o
 
 debug:clean luajit $(OBJS) $(LUAOBJS)
-	$(CC) $(CFLAGS) -g main.c $(OBJS) $(LUAOBJS) $(LIBS) -o nfsf $(LDFLAGS)
+	$(CC) $(CFLAGS) -g main.c $(OBJS) $(LUAOBJS) $(LIBS) -o nflogsflowd $(LDFLAGS)
 stable:clean luajit $(OBJS) $(LUAOBJS) nfsf.o
-	$(CC) $(CFLAGS) main.c $(OBJS) $(LUAOBJS) $(LIBS) -o nfsf $(LDFLAGS)
+	$(CC) $(CFLAGS) main.c $(OBJS) $(LUAOBJS) $(LIBS) -o nflogsflowd $(LDFLAGS)
 clean:
-	rm -vfr *~ nfsf
+	rm -vfr *~ nflogsflowd
 
 .PHONY: luajit
 luajit:
