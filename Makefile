@@ -21,7 +21,7 @@ luajit:
 	cd luajit && $(MAKE)
 
 %.lua.h: %.lua
-	luajit -bg $< $@
+	luajit/src/luajit -bg $< $@
 
 %.lua.o: %.lua
-	luajit -bg $< $@
+	luajit/src/luajit -bg $< $@
