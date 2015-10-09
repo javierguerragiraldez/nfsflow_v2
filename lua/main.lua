@@ -6,6 +6,19 @@ local nflog = require 'nflog'
 local sflow = require 'sflow'
 
 local opts = utils.getargs(unpack(args))
+if opts.help then
+	print [[
+	recognized options:
+		--help				this help text
+		--agent-id=<ipaddr>		(required)
+		--max-sample=<max samplesize> 	(default 160 bytes)
+		--mtu=<max_packetsize>		(default 1480 bytes)
+		--sampling-rate=<declared-rate> (default 2048)
+		--collector=<ip:port>		(required)
+		--nflog-group=<group>		(required)
+	]]
+	os.exit()
+end
 
 -- sFlow collecting 'port'
 local outport = sflow.Port({

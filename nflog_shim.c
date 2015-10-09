@@ -38,4 +38,3 @@ int cb(struct nflog_g_handle *gh,
 
 	return 0;
 }
-
