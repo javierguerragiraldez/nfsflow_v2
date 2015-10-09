@@ -8,7 +8,7 @@ local sflow = require 'sflow'
 local opts = utils.getargs(unpack(args))
 
 local outport = sflow.Port({
-	address = 0x01020304,
+	address = opts['agent-id'],
 	max_sample = tonumber(opts['max-sample']) or 160,
 	max_packet = tonumber(opts['mtu']) or 1480,
 	subagent = tonumber(opts['agent-id']) or 0,
@@ -30,7 +30,7 @@ local logh = nflog(S.c.AF.INET6, tonumber(opts['nflog-group']))
 local buf = ffi.new('uint8_t[?]', 8192)
 logh:loop(function(sample)
 	local offset = 0
-	
+
 	ffi.copy(buf + offset, sample.header.p, sample.header.size)
 	offset = offset + sample.header.size
 

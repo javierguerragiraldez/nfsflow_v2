@@ -1,6 +1,7 @@
 
 local bit = require 'bit'
 local ffi = require 'ffi'
+local S = require 'syscall'
 
 ffi.cdef [[
 
@@ -75,7 +76,7 @@ function Port:__new(opts)
 		proto_header = {
 			version = htonl(5),
 			xx01 = htonl(1), 		-- ??
-			ag_address = opts.address,
+			ag_address = S.t.in_addr(opts.address).s_addr,
 			sub_agnt_id = opts.subagent,
 			seq = 1,				-- pick from somewhere?
 			uptime = localtime,
