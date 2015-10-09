@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include "luajit/src/lua.h"
+#include "luajit/src/lualib.h"
+#include "luajit/src/lauxlib.h"
 
 int main (int argc, char **argv) {
 
