@@ -1,21 +1,23 @@
 CC=gcc
 CFLAGS = -Wall -D__USE_GNU
 
-LIBS+= libs/libluajit.a
+LIBS+= libs/libluajit.a -lnetfilter_log -lm -ldl
 LDFLAGS+= -Wl,-E
 
 luafiles := $(shell ls lua/*.lua)
 LUAOBJS := $(addsuffix .o, $(luafiles))
 
-debug:clean $(LUAOBJS)
-	$(CC) $(CFLAGS) -g main.c $(LUAOBJS) $(LIBS) -lm -ldl -o nfsf $(LDFLAGS)
-stable:clean $(LUAOBJS) nfsf.o
-	$(CC) $(CFLAGS) main.c $(LUAOBJS) $(LIBS) -lm -ldl -o nfsf $(LDFLAGS)
+OBJS = nflog_shim.o
+
+debug:clean $(OBJS) $(LUAOBJS)
+	$(CC) $(CFLAGS) -g main.c $(OBJS) $(LUAOBJS) $(LIBS) -o nfsf $(LDFLAGS)
+stable:clean $(OBJS) $(LUAOBJS) nfsf.o
+	$(CC) $(CFLAGS) main.c $(OBJS) $(LUAOBJS) $(LIBS) -o nfsf $(LDFLAGS)
 clean:
 	rm -vfr *~ nfsf
 
 %.lua.h: %.lua
-	luajit -b $< $@
+	luajit -bg $< $@
 
 %.lua.o: %.lua
-	luajit -b $< $@
+	luajit -bg $< $@
