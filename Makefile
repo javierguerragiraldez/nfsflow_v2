@@ -5,7 +5,7 @@ LIBS+= luajit/src/libluajit.a -lnetfilter_log -lm -ldl
 LDFLAGS+= -Wl,-E
 
 luafiles := $(shell find lua ljsyscall -name '*.lua')
-LUAOBJS := $(addsuffix .o, $(luafiles))
+LUAOBJS := $(addsuffix .o, $(basename $(luafiles)))
 
 OBJS = nflog_shim.o
 
@@ -20,7 +20,5 @@ clean:
 luajit:
 	cd luajit && $(MAKE)
 
-.SUFFIXES:
-
-%.lua.o: %.lua
+%.o: %.lua
 	LUA_PATH='./luajit/src/?.lua' luajit/src/luajit -bgn $(subst /,_,$(patsubst lua/%,%,$(patsubst ljsyscall/%,%,$(basename $<)))) $< $@
