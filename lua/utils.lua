@@ -36,4 +36,55 @@ function utils.hexdump(buf, n)
 	io.write('\n')
 end
 
+
+if ffi.abi('le') then
+	ffi.cdef [[
+		typedef struct {
+			uint32_t n;
+		} n32_t;
+
+		typedef struct {
+			uint16_t n;
+		} n16_t;
+	]]
+
+	ffi.metatype('n32_t', {
+		__new = function (ct, value)
+			return ffi.new(ct, bit.bswap(value))
+		end,
+		__index = function (self, key)
+			if key=='h' then return bit.bswap(self.n) end
+		end,
+
+		__newindex = function (self, key, value)
+			if key=='h' then self.n = bit.bswap(value) end
+		end,
+	})
+
+	ffi.metatype('n16_t', {
+		__new = function (ct, value)
+			return ffi.new(ct, bit.rshift(bit.bswap(self.n), 16))
+		end,
+		__index = function (self, key)
+			if key == 'h' then return bit.rshift(bit.bswap(self.n), 16) end
+		end,
+
+		__newindex = function (self, key, value)
+			if key == 'h' then self.n = bit.rshift(bit.bswap(value), 16) end
+		end,
+	})
+
+else
+	ffi.cdef [[
+		typedef struct {
+			uint32_t h;
+		} n32;
+
+		typedef struct {
+			uint16_t h;
+		} n16;
+	]]
+end
+
+
 return utils
